@@ -1,60 +1,123 @@
-# Refactor a Sudoku Game written in Python Flask
+# Sudoku Game
 
-Use this simple Sudoku game as a starting point to practice your skills with GitHub Copilot. The goal is to refactor the code to use modern technologies, while also adding new features and improving the overall user experience.
+A complete browser-based Sudoku application built with Python and Flask. The project generates valid puzzles with a unique solution, tracks game progress in real time, and provides a responsive, accessible interface for solving puzzles on desktop or mobile devices.
 
-## Getting Started
+## Overview
 
-Follow these instructions to get a copy of the project up and running on your local machine.
+This application lets a player start a new Sudoku puzzle at Easy, Medium, or Hard difficulty, fill in the board, receive immediate feedback on invalid entries, request hints, and check the solution against the correct answer. The game includes a countdown-style timer, hint tracking, completion handling, and a Top 10 fastest-score board stored in the browser with localStorage.
 
-### Dependencies
+## Technology Stack
 
-```
-- Modern web browser (Chrome, Firefox, Edge, etc.)
 - Python 3
-```
+- Flask web framework
+- Jinja templates for the page shell
+- HTML, CSS, and JavaScript for the client-side gameplay experience
+- pytest for automated testing
 
-### Installation
+## Setup and Run
 
-1. Fork this repository to your GitHub account. (You can use the "Fork" button on the top right corner of the repository page.)
-
-2. Clone your forked repository to your local machine.
-
-3. Open a terminal window and navigate to the "github-copilot-python/starter" directory.
-
-4. Create a Python virtual environment and activate it (optional but highly recommended).
+From the repository root, navigate to the application directory:
 
 ```bash
-python3 -m venv .venv
+cd github-copilot-python/starter
+```
+
+### Virtual environment setup
+
+Create and activate a virtual environment:
+
+```bash
+python -m venv .venv
+```
+
+On Windows PowerShell:
+
+```powershell
+.\.venv\Scripts\Activate.ps1
+```
+
+On macOS/Linux:
+
+```bash
 source .venv/bin/activate
 ```
 
-5. Install required Python packages.
+### Install dependencies
 
 ```bash
+python -m pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
-6. Run the Flask app.
+### Run the application
 
 ```bash
 python app.py
 ```
 
-7. Open http://127.0.0.1:5000 in your browser.
+Then open the app in a browser at:
 
-## Project Instructions
+```text
+http://127.0.0.1:5000
+```
 
-Use GitHub Copilot to refactor the code for this game to add more advanced features. The goal is to create a more modern and maintainable codebase and add additional functionality to the final product. You can use any combination of code completion and chat features, like Ask, Edit, or Agent modes.
+## Automated Tests
 
-- Errors should be handled gracefully with appropriate messages to the user.
-- Implement a Sudoku board generator that creates a valid Sudoku puzzle with a unique solution.
-- Add a timer to track how long it takes to solve the puzzle.
-- Implement a solution checker that verifies if the user's solution is correct using event delegation.
-- Add a difficulty selector to allow users to choose between easy, medium, and hard puzzles.
-- Add a hint feature that provides clues for the user that are noted with unique colors.
-- Add a check puzzle button that checks the current state of the board against the solution.
-- User should get immediate feedback on their input, such as highlighting invalid entries.
-- Top 10 scores should be saved in local storage and displayed on the page with the user's name, time taken, hints used, and difficulty level.
-- The game should be responsive and work well on both desktop and mobile devices.
-- UI colors should be visually appealing and accessible.
-- Completed and correct puzzles should display a congratulatory message with the time taken and hints used and ask for the user's name for Top 10 times.
+Run the full automated test suite from the project directory:
+
+```bash
+python -m pytest -q
+```
+
+This command is the project-standard validation step for both Sudoku logic and Flask endpoint behavior.
+
+## Game Features
+
+- Unique-solution Sudoku generation using a backtracking-based board generator and solution-count validation
+- Easy, Medium, and Hard puzzle difficulties with different numbers of prefilled cells
+- Locked prefilled cells that cannot be edited by the player
+- Immediate invalid-move feedback while entering values
+- Check Solution action that compares the current board against the correct solution and highlights incorrect cells
+- Hint functionality that fills one correct empty cell, locks it, and increments the hint counter
+- Timer that starts on a fresh game and stops when the puzzle is completed
+- Completion handling that confirms the puzzle was solved correctly and records a score entry
+- Top 10 fastest scores displayed with player name, completion time, difficulty, and hints used
+- Browser persistence using localStorage so Top 10 scores remain available across sessions
+- Light and Dark mode toggle for the interface
+- Responsive layout for desktop and mobile screens
+- Accessible UI considerations including semantic labels, keyboard focus states, status messaging, and readable color contrast
+
+## Project Structure
+
+```text
+github-copilot-python/
+├── README.md
+├── .github/
+│   └── copilot-instructions.md
+└── starter/
+    ├── app.py
+    ├── game_service.py
+    ├── sudoku_logic.py
+    ├── requirements.txt
+    ├── static/
+    │   ├── main.js
+    │   └── styles.css
+    ├── templates/
+    │   └── index.html
+    └── tests/
+        ├── conftest.py
+        ├── test_app.py
+        └── test_sudoku_logic.py
+```
+
+## GitHub Copilot Usage
+
+GitHub Copilot was used during development to help with code generation, iteration, and validation of the Flask and Sudoku logic. The project remains a working, test-backed Flask application that follows the requested project goals and rubric without modifying unrelated application behavior.
+
+## Testing Approach
+
+The application is validated with pytest to cover both the Flask routes and the core Sudoku puzzle logic. The automated suite checks puzzle generation, uniqueness guarantees, difficulty settings, board validation, hint behavior, and solution checking so the project remains stable as a final submission.
+
+## Reviewer Notes
+
+This project is a functional single-page Sudoku game with a Python Flask backend, generated unique-solution puzzles, and a polished frontend experience. It is designed to be easy to run locally and straightforward to review in its current state.

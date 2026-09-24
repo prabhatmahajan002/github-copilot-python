@@ -2,6 +2,7 @@
 const SIZE = 9;
 const SCORES_STORAGE_KEY = 'sudokuTopScores';
 const MAX_SCORES = 10;
+const THEME_STORAGE_KEY = 'sudokuTheme';
 let puzzle = [];
 let hintsUsed = 0;
 let elapsedSeconds = 0;
@@ -47,6 +48,41 @@ function saveScores(scores) {
     localStorage.setItem(SCORES_STORAGE_KEY, JSON.stringify(sortAndTrimScores(scores)));
   } catch (error) {
     // Storage may be unavailable in private browsing or restricted environments.
+  }
+}
+
+function applyTheme(theme) {
+  const isDark = theme === 'dark';
+  document.documentElement.dataset.theme = isDark ? 'dark' : 'light';
+  const toggle = document.getElementById('theme-toggle');
+  const label = document.getElementById('theme-toggle-label');
+  if (toggle && label) {
+    toggle.setAttribute('aria-pressed', String(isDark));
+    toggle.setAttribute('aria-label', isDark ? 'Switch to light mode' : 'Switch to dark mode');
+    label.textContent = isDark ? 'Light mode' : 'Dark mode';
+  }
+}
+
+function initializeTheme() {
+  let savedTheme = null;
+  try {
+    savedTheme = localStorage.getItem(THEME_STORAGE_KEY);
+  } catch (error) {
+    // Use the system preference when storage is unavailable.
+  }
+  const theme = savedTheme === 'dark' || savedTheme === 'light'
+    ? savedTheme
+    : (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+  applyTheme(theme);
+}
+
+function toggleTheme() {
+  const theme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+  applyTheme(theme);
+  try {
+    localStorage.setItem(THEME_STORAGE_KEY, theme);
+  } catch (error) {
+    // The theme still applies for the current page when storage is unavailable.
   }
 }
 
@@ -111,7 +147,8 @@ function resetGameState(difficulty) {
 
 function setMessage(text, color = '#d32f2f') {
   const message = document.getElementById('message');
-  message.style.color = color;
+  const tones = {'#388e3c': 'success', '#795548': 'hint', '#333': 'neutral', '#d32f2f': 'error'};
+  message.dataset.tone = tones[color] || 'error';
   message.innerText = text;
 }
 
@@ -237,6 +274,7 @@ function createBoardElement() {
       input.className = 'sudoku-cell';
       input.dataset.row = i;
       input.dataset.col = j;
+      input.classList.add((Math.floor(i / 3) + Math.floor(j / 3)) % 2 === 0 ? 'region-a' : 'region-b');
       rowDiv.appendChild(input);
     }
     boardDiv.appendChild(rowDiv);
@@ -257,12 +295,12 @@ function renderPuzzle(puz) {
         inp.value = val;
         inp.disabled = true;
         inp.readOnly = true;
-        inp.className = 'sudoku-cell prefilled';
+        inp.classList.add('prefilled');
       } else {
         inp.value = '';
         inp.disabled = false;
         inp.readOnly = false;
-        inp.className = 'sudoku-cell';
+        inp.className = `sudoku-cell ${inp.classList.contains('region-b') ? 'region-b' : 'region-a'}`;
       }
     }
   }
@@ -311,7 +349,7 @@ async function requestHint() {
     input.value = data.value;
     input.disabled = true;
     input.readOnly = true;
-    input.className = 'sudoku-cell hinted';
+    input.classList.add('hinted');
     hintsUsed += 1;
     document.getElementById('hints-used').innerText = `Hints used: ${hintsUsed}`;
     setMessage(`Hint used: ${hintsUsed}.`, '#795548');
@@ -368,6 +406,8 @@ async function checkPuzzle() {
 
 // Wire buttons
 window.addEventListener('load', () => {
+  initializeTheme();
+  document.getElementById('theme-toggle').addEventListener('click', toggleTheme);
   document.getElementById('new-game').addEventListener('click', newGame);
   document.getElementById('hint').addEventListener('click', requestHint);
   document.getElementById('check-solution').addEventListener('click', checkPuzzle);
