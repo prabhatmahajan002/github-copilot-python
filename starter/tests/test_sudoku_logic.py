@@ -114,6 +114,30 @@ def test_generate_puzzle_rejects_invalid_clue_counts():
         sudoku_logic.generate_puzzle(clues=82)
 
 
+def test_generate_easy_puzzle_uses_45_clues_and_has_one_solution():
+    puzzle, solution = sudoku_logic.generate_puzzle(clues=45)
+
+    assert_valid_solution(solution)
+    assert sum(cell != sudoku_logic.EMPTY for row in puzzle for cell in row) == 45
+    assert sudoku_logic.count_solutions(puzzle) == 1
+
+
+def test_generate_medium_puzzle_uses_35_clues_and_has_one_solution():
+    puzzle, solution = sudoku_logic.generate_puzzle(clues=35)
+
+    assert_valid_solution(solution)
+    assert sum(cell != sudoku_logic.EMPTY for row in puzzle for cell in row) == 35
+    assert sudoku_logic.count_solutions(puzzle) == 1
+
+
+def test_generate_hard_puzzle_uses_27_clues_and_has_one_solution():
+    puzzle, solution = sudoku_logic.generate_puzzle(clues=27)
+
+    assert_valid_solution(solution)
+    assert sum(cell != sudoku_logic.EMPTY for row in puzzle for cell in row) == 27
+    assert sudoku_logic.count_solutions(puzzle) == 1
+
+
 def test_generate_puzzle_returns_solution_and_matching_prefilled_cells():
     puzzle, solution = sudoku_logic.generate_puzzle(clues=35)
 

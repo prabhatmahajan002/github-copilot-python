@@ -38,18 +38,30 @@ function renderPuzzle(puz) {
       if (val !== 0) {
         inp.value = val;
         inp.disabled = true;
-        inp.className += ' prefilled';
+        inp.readOnly = true;
+        inp.className = 'sudoku-cell prefilled';
       } else {
         inp.value = '';
         inp.disabled = false;
+        inp.readOnly = false;
+        inp.className = 'sudoku-cell';
       }
     }
   }
 }
 
 async function newGame() {
-  const res = await fetch('/new');
+  const difficulty = document.getElementById('difficulty').value;
+  const query = new URLSearchParams({difficulty}).toString();
+  const res = await fetch(`/new?${query}`);
   const data = await res.json();
+
+  if (!res.ok) {
+    document.getElementById('message').style.color = '#d32f2f';
+    document.getElementById('message').innerText = data.error || 'Unable to start a new game.';
+    return;
+  }
+
   renderPuzzle(data.puzzle);
   document.getElementById('message').innerText = '';
 }
