@@ -232,9 +232,21 @@ function findConflicts(board) {
   return conflicts;
 }
 
-function applyInvalidStyling(conflicts) {
-  getBoardInputs().forEach((input, index) => {
-    if (!input.disabled) input.classList.toggle('invalid', conflicts.has(index));
+function clearImmediateConflictStyling() {
+  getBoardInputs().forEach((cell) => {
+    cell.classList.remove('invalid', 'conflict');
+  });
+}
+
+function applyImmediateConflictStyling(input, conflicts) {
+  const currentIndex = Number(input.dataset.row) * SIZE + Number(input.dataset.col);
+
+  getBoardInputs().forEach((cell, index) => {
+    const isCurrentCell = index === currentIndex;
+    const isConflictPeer = !isCurrentCell && conflicts.has(index);
+
+    cell.classList.toggle('invalid', isCurrentCell && Boolean(input.value) && conflicts.has(currentIndex));
+    cell.classList.toggle('conflict', isConflictPeer);
   });
 }
 
@@ -248,9 +260,11 @@ function handleBoardInput(event) {
 
   const validation = validateInput(input.value);
   input.value = validation.value;
-  applyInvalidStyling(findConflicts(readBoard()));
+
   const conflicts = findConflicts(readBoard());
-  input.classList.toggle('invalid', !validation.isValid || conflicts.has(Number(input.dataset.row) * SIZE + Number(input.dataset.col)));
+  clearImmediateConflictStyling();
+  applyImmediateConflictStyling(input, conflicts);
+
   if (conflicts.size > 0 || !validation.isValid) {
     setMessage('Invalid move.');
   } else if (document.getElementById('message').innerText === 'Invalid move.') {
