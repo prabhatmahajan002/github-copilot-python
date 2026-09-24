@@ -102,3 +102,28 @@ button:hover {
     font-weight: bold;
     color: #333;
 }
+
+#scoreboard {
+    margin: 30px auto;
+    max-width: 700px;
+}
+
+#scoreboard h2 {
+    color: #333;
+}
+
+#scoreboard table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+}
+
+#scoreboard th,
+#scoreboard td {
+    padding: 8px;
+    border: 1px solid #bbb;
+}
+
+#scoreboard th {
+    background: #e0e0e0;
+}
