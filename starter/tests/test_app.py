@@ -1,3 +1,5 @@
+import pytest
+
 import app
 import sudoku_logic
 
@@ -66,6 +68,15 @@ def test_check_returns_error_when_no_game_is_in_progress(client):
     assert response.get_json() == {'error': 'No game in progress'}
 
 
+@pytest.mark.parametrize('payload', [None, {}, {'board': []}, {'board': [[0]]}, {'board': [['1'] * 9 for _ in range(9)]}])
+def test_check_rejects_malformed_board_requests(client, payload):
+    client.get('/new')
+    response = client.post('/check', json=payload)
+
+    assert response.status_code == 400
+    assert response.get_json() == {'error': 'Invalid board'}
+
+
 def test_check_identifies_incorrect_cells(client):
     client.get('/new')
     board = sudoku_logic.deep_copy(app.CURRENT['solution'])
@@ -85,3 +96,40 @@ def test_check_returns_no_incorrect_cells_for_the_current_solution(client):
 
     assert response.status_code == 200
     assert response.get_json() == {'incorrect': []}
+
+
+def test_hint_returns_an_empty_editable_cell_and_correct_value(client):
+    client.get('/new')
+    board = sudoku_logic.deep_copy(app.CURRENT['puzzle'])
+
+    response = client.post('/hint', json={'board': board})
+
+    assert response.status_code == 200
+    hint = response.get_json()
+    assert board[hint['row']][hint['column']] == 0
+    assert app.CURRENT['puzzle'][hint['row']][hint['column']] == 0
+    assert hint['value'] == app.CURRENT['solution'][hint['row']][hint['column']]
+
+
+def test_hint_handles_a_board_with_no_empty_editable_cells(client):
+    client.get('/new')
+    board = sudoku_logic.deep_copy(app.CURRENT['solution'])
+
+    response = client.post('/hint', json={'board': board})
+
+    assert response.status_code == 200
+    assert response.get_json() == {
+        'hint': None,
+        'message': 'No empty cells available for a hint.',
+    }
+
+
+def test_hint_rejects_requests_without_a_game_or_with_invalid_boards(client):
+    response = client.post('/hint', json={'board': sudoku_logic.create_empty_board()})
+    assert response.status_code == 400
+    assert response.get_json() == {'error': 'No game in progress'}
+
+    client.get('/new')
+    response = client.post('/hint', json={'board': []})
+    assert response.status_code == 400
+    assert response.get_json() == {'error': 'Invalid board'}
